@@ -1,0 +1,447 @@
+<!doctype html><html lang='bn'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no'><script src='https://telegram.org/js/telegram-web-app.js?63'></script><title>LYRICS Touch To Copy</title>
+<style>
+body{margin:0;font-family:system-ui,-apple-system,"Noto Sans Bengali",sans-serif;background:#f7f5fb;color:#24202b}
+.app{min-height:100vh;padding-bottom:82px}
+.topbar{position:sticky;top:0;z-index:5;padding:16px 18px;background:#fff;box-shadow:0 2px 12px #00000012}
+.brand{font-weight:800;font-size:18px}.brand span{margin-left:6px}.topbar{display:flex;align-items:center;justify-content:space-between}.tgUser{font-size:11px;font-weight:800;background:#eef7ff;color:#2477b8;border-radius:999px;padding:7px 9px;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.view{display:none;padding:18px;max-width:680px;margin:auto}.view.active{display:block}
+.hero{padding:12px 4px 18px}.hero h1{margin:0 0 5px;font-size:25px}.hero p{margin:0;color:#777}
+.fileCard{width:100%;display:flex;align-items:center;gap:13px;text-align:left;border:0;border-radius:18px;background:#fff;padding:17px;margin:9px 0;box-shadow:0 5px 18px #0000000c;cursor:pointer}
+.fileIcon{font-size:25px}.fileCard b{display:block;font-size:17px}.fileCard small{display:block;color:#888;margin-top:4px}.arrow{margin-left:auto;font-size:28px;color:#aaa}
+.addFileBtn,.saveBtn{width:100%;border:0;border-radius:16px;padding:15px;font-size:16px;font-weight:800;cursor:pointer;margin-top:12px}
+.addFileBtn{background:#24202b;color:white}.saveBtn{background:#6c4bd8;color:#fff}
+.back{border:0;background:#eee8f7;border-radius:12px;padding:10px 14px;font-weight:700;cursor:pointer}
+label{display:block;font-weight:700;margin:13px 0 7px}
+input,textarea{box-sizing:border-box;width:100%;border:1px solid #ddd4e8;border-radius:15px;padding:14px;font-size:16px;background:#fff;outline:none}
+textarea{min-height:260px;resize:vertical;line-height:1.65}
+.count{text-align:right;color:#777;margin-top:7px}
+.lyricLine{display:block;width:100%;border:0;border-radius:14px;background:#fff;margin:8px 0;padding:14px 12px;text-align:left;line-height:1.55;box-shadow:0 3px 12px #00000009;cursor:pointer;font-size:15px;white-space:pre-wrap;word-break:break-word}
+.lyricLine{transition:transform .16s,box-shadow .16s,background .16s}.lyricLine.copied{transform:scale(.975);opacity:.72;background:#f0eaff;box-shadow:0 0 0 2px #6c4bd833,0 6px 18px #00000010}
+.bottom{position:fixed;bottom:0;left:0;right:0;height:68px;background:#fff;border-top:1px solid #eee;display:flex;justify-content:space-around;z-index:10}
+.bottom button{border:0;background:none;font-size:24px;color:#777;min-width:70px}.bottom small{display:block;font-size:11px}.navActive{color:#6c4bd8!important}
+.socialBar{display:flex;align-items:center;gap:7px;margin:0 0 13px;flex-wrap:wrap}.socialBtn{border:0;background:#f7f3fb;color:#5d4a7c;border-radius:11px;padding:8px 10px;font-size:12px;font-weight:800;cursor:pointer}.socialBtn.liked{background:#ffe9ef;color:#d83d65}.commentBox{display:none;margin:0 0 14px;padding:12px;background:#fff;border:1px solid #e7e1ef;border-radius:14px}.commentBox textarea{min-height:78px;font-size:14px;padding:10px}.commentList{margin-top:9px}.commentItem{padding:8px 10px;background:#f8f6fb;border-radius:10px;margin-top:6px;font-size:13px;line-height:1.45;word-break:break-word}.lyricWrap{position:relative}.shareLine{border:0;background:#f1edf6;color:#5d4a7c;border-radius:10px;padding:7px 10px;margin:0 0 8px auto;display:block;font-size:12px;font-weight:700;cursor:pointer}.shareLine:active{transform:scale(.97)}
+#toast{position:fixed;left:50%;bottom:85px;transform:translateX(-50%) translateY(15px);background:#24202b;color:#fff;padding:11px 17px;border-radius:13px;opacity:0;pointer-events:none;transition:.2s;z-index:20}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+.fileActions{margin-left:auto;display:flex;align-items:center;gap:7px}
+.editBtn,.deleteBtn{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:#f3eff8;color:#5d4a7c;font-size:17px;cursor:pointer}
+.deleteBtn{background:#fff0f0;color:#c44}
+.fileActions .arrow{margin-left:0}
+
+.searchBox{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #ddd4e8;border-radius:16px;padding:4px 8px 4px 14px;box-shadow:0 4px 14px #0000000a}
+.searchBox span{font-size:23px;color:#777}
+.searchBox input{border:0;padding:11px 4px;box-shadow:none;outline:0}
+.searchBox button{border:0;background:#f1edf6;border-radius:10px;width:32px;height:32px;font-size:20px;color:#777;cursor:pointer}
+.resultCount{font-size:13px;color:#777;margin:16px 3px 8px}
+.searchResult{width:100%;border:0;background:#fff;border-radius:15px;padding:14px;margin:7px 0;text-align:left;box-shadow:0 3px 12px #00000009;cursor:pointer}
+.resultTop{display:flex;justify-content:space-between;color:#6c4bd8;font-size:14px}
+.resultLine{margin-top:7px;line-height:1.55;word-break:break-word}
+mark{background:#fff0a8;border-radius:3px;padding:0 2px}
+.emptySearch{text-align:center;padding:65px 20px;color:#777;font-size:30px}
+.emptySearch b{display:block;font-size:17px;color:#444;margin-top:9px}
+.emptySearch small{display:block;font-size:13px;margin-top:5px}
+
+.favoriteCard{background:#fff;border:1px solid #e7e1ef;border-radius:18px;padding:14px;margin:10px 0;box-shadow:0 4px 14px #00000008}.favoriteTop{display:flex;gap:10px;align-items:center}.favoriteLine{flex:1;border:0;background:none;text-align:left;font-size:14px;line-height:1.5;cursor:pointer;padding:0}.ownerCard{margin-top:14px;background:#fbf8ff;border:1px solid #e7dcf5;border-radius:18px;padding:15px;text-align:center}.ownerCard .ownerLabel{font-size:12px;color:#7b6a8f;font-weight:800;letter-spacing:.4px}.ownerCard .ownerName{font-size:19px;font-weight:900;color:#4d3970;margin-top:4px}.ownerCard small{display:block;color:#777;margin-top:3px;font-size:12px}.profileCard{background:#fff;border:1px solid #e7e1ef;border-radius:20px;padding:18px;box-shadow:0 4px 14px #00000008}.avatarPreview{width:88px;height:88px;border-radius:50%;background:#eee8f7;display:grid;place-items:center;font-size:40px;overflow:hidden;margin:0 auto 14px}.avatarPreview img{width:100%;height:100%;object-fit:cover}.profileName{font-size:20px;font-weight:800;text-align:center;margin-bottom:4px}.profileHint{text-align:center;color:#777;font-size:13px;margin-bottom:16px}.removeBtn{border:0;background:#fff0f0;color:#b33;border-radius:12px;padding:9px 12px;font-weight:700;cursor:pointer;margin-top:8px}.favoriteEmpty{text-align:center;padding:55px 20px;color:#777}.favoriteEmpty b{display:block;color:#444;margin-top:8px}.backupCard{background:#fff;border:1px solid #e7e1ef;border-radius:18px;padding:16px;margin:12px 0;box-shadow:0 4px 14px #00000008}.backupCard h3{margin:0 0 7px}.backupCard p{margin:0 0 12px;color:#777;font-size:13px;line-height:1.5}.backupCard input{width:100%;box-sizing:border-box;border:1px dashed #cfc5dc;border-radius:14px;padding:12px;background:#faf8fc}.backupNote{font-size:12px;color:#777;line-height:1.55;margin:14px 3px}
+
+.stylePicker{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:10px 0 16px}.styleChoice{border:1px solid #e4dbea;background:#fff;border-radius:14px;padding:11px;text-align:left;cursor:pointer;font-weight:700}.styleChoice.active{border:2px solid #7c4dff;background:#f5efff}.styleChoice small{display:block;color:#777;font-weight:500;margin-top:4px}.styleBadge{font-size:11px;color:#7c4dff;margin-top:5px}.lyricWrap.style1 .lyricLine{background:linear-gradient(135deg,#fff,#f8f0ff);border-left:4px solid #8b5cf6}.lyricWrap.style2 .lyricLine{background:#fff8f2;border:1px solid #f1d5bd;border-radius:22px}.lyricWrap.style3 .lyricLine{background:#f1fbfa;border-bottom:2px dashed #72b7ae}.lyricWrap.style4 .lyricLine{background:#fff1f5;border-radius:4px 22px 4px 22px}.lyricWrap.style5 .lyricLine{background:#f5f7ff;box-shadow:inset 0 0 0 1px #d8def8}.lyricWrap.style6 .lyricLine{background:#fdfbea;border-left:5px solid #e4c75c}.lyricWrap.style7 .lyricLine{background:#f7f7f7;border-radius:0;border-top:1px solid #ddd;border-bottom:1px solid #ddd}.lyricWrap.style8 .lyricLine{background:#fff;border:1px solid #eadcf8;border-radius:30px;box-shadow:0 5px 18px #0000000d}.lyricWrap.style9 .lyricLine{background:#f6fbff;border-right:5px solid #7bb7dc} .lyricWrap.style10 .lyricLine{background:linear-gradient(90deg,#fff,#f7f7ff,#fff);border:1px solid #ddd}
+.ownerGate{max-width:430px;margin:20px auto;padding:18px;border-radius:18px;background:#fff;box-shadow:0 5px 18px #00000010}.ownerGate input{width:100%;box-sizing:border-box;margin:8px 0;padding:12px;border:1px solid #ddd;border-radius:12px}.ownerGate button{width:100%;padding:12px;border:0;border-radius:12px;background:#6c4bd8;color:#fff;font-weight:700}.ownerOnly{display:none!important}
+</style>
+</head><body>
+<div class="app">
+<header class="topbar"><div class="brand">📝 <span>LYRICS Touch To Copy</span></div><div id="tgUser" class="tgUser">Telegram</div></header>
+<main id="main">
+<section id="homeView" class="view active">
+  <div class="hero"><h1>My Lyrics Files</h1><p>প্রতিটি Lyrics আলাদা File হিসেবে রাখুন</p></div>
+  <div id="fileList"></div>
+  <button id="addFileBtn" class="addFileBtn ownerOnly" onclick="openAdd()">＋ Add Lyrics File</button>
+</section>
+
+<section id="searchView" class="view">
+  <button class="back" onclick="showView('homeView')">← Home</button>
+  <div class="hero"><h1>🔍 Search Lyrics</h1><p>File name বা Lyrics line দিয়ে খুঁজুন</p></div>
+  <div class="searchBox">
+    <span>⌕</span>
+    <input id="searchInput" placeholder="Lyrics খুঁজুন..." oninput="runSearch()">
+    <button onclick="clearSearch()">×</button>
+  </div>
+  <div id="searchResults"></div>
+</section>
+
+<section id="readerView" class="view">
+  <button class="back" onclick="showView('homeView')">← Home</button>
+  <div id="readerTitle" class="hero"></div>
+  <div id="readerLines"></div>
+</section>
+
+<section id="ownerView" class="view">
+  <button class="back" onclick="showView('homeView')">← Home</button>
+  <div class="hero"><h1>👑 Owner Access</h1><p>Telegram account দিয়েই Owner access যাচাই হবে</p></div>
+  <div class="ownerGate"><div id="ownerStatus" style="line-height:1.6">Telegram account যাচাই হচ্ছে…</div><button onclick="showView('homeView')">← Back to App</button></div>
+</section>
+
+<section id="addView" class="view">
+  <button class="back" onclick="showView('homeView')">← Home</button>
+  <div class="hero"><h1>＋ Add Lyrics File</h1><p>নিজের Lyrics File তৈরি করুন</p></div>
+  <label>File Name</label>
+  <input id="fileName" placeholder="যেমন: Lyrics 4">
+  <label>Lyrics</label>
+  <textarea id="lyricsText" placeholder="প্রতিটি লাইন আলাদা লাইনে লিখুন বা paste করুন..."></textarea>
+  <div id="lineCount" class="count">0টি Lyrics</div>
+  <label>Lyrics Style</label>
+  <div class="stylePicker" id="stylePicker">
+    <button type="button" class="styleChoice" data-style="1" onclick="selectLyricsStyle(1)">💜 Soft Glow<small>হালকা Glow</small></button>
+    <button type="button" class="styleChoice" data-style="2" onclick="selectLyricsStyle(2)">🧡 Warm Bubble<small>নরম Bubble</small></button>
+    <button type="button" class="styleChoice" data-style="3" onclick="selectLyricsStyle(3)">🩵 Aqua Dash<small>Fresh Dash</small></button>
+    <button type="button" class="styleChoice" data-style="4" onclick="selectLyricsStyle(4)">💗 Pink Wave<small>Pink Wave</small></button>
+    <button type="button" class="styleChoice" data-style="5" onclick="selectLyricsStyle(5)">🤍 Clean Card<small>Clean Look</small></button>
+    <button type="button" class="styleChoice" data-style="6" onclick="selectLyricsStyle(6)">💛 Golden Edge<small>Golden Edge</small></button>
+    <button type="button" class="styleChoice" data-style="7" onclick="selectLyricsStyle(7)">🖤 Classic Line<small>Classic</small></button>
+    <button type="button" class="styleChoice" data-style="8" onclick="selectLyricsStyle(8)">☁️ Round Cloud<small>Round Card</small></button>
+    <button type="button" class="styleChoice" data-style="9" onclick="selectLyricsStyle(9)">💙 Blue Edge<small>Blue Edge</small></button>
+    <button type="button" class="styleChoice" data-style="10" onclick="selectLyricsStyle(10)">✨ Silver Flow<small>Silver Flow</small></button>
+  </div>
+  <button class="saveBtn" onclick="saveFile()">💾 Save Lyrics File</button>
+</section>
+
+<section id="favoritesView" class="view">
+  <button class="back" onclick="showView('homeView')">← Home</button>
+  <div class="hero"><h1>♡ Favorites</h1><p>আপনার পছন্দের Lyrics এখানে থাকবে</p></div>
+  <div id="favoriteList"></div>
+</section>
+
+<section id="profileView" class="view">
+  <button class="back" onclick="showView('homeView')">← Home</button>
+  <div class="hero"><h1>👤 My Profile</h1><p>আপনার নাম ও ছবি সংরক্ষণ করুন</p></div>
+  <div class="profileCard">
+    <div id="avatarPreview" class="avatarPreview">👤</div>
+    <div id="profileDisplayName" class="profileName">Your Name</div>
+    <div class="profileHint">এই তথ্য শুধু আপনার ডিভাইসেই সংরক্ষিত থাকবে</div>
+    <label>আপনার নাম</label>
+    <input id="profileNameInput" maxlength="40" placeholder="আপনার নাম লিখুন">
+    <label>Profile Photo</label>
+    <input id="profilePhotoInput" type="file" accept="image/*" onchange="previewProfilePhoto(event)">
+    <button class="saveBtn" onclick="saveProfile()">💾 Save Profile</button>
+    <button class="removeBtn" onclick="removeProfilePhoto()">🗑️ Photo Remove</button>
+  </div>
+  <div class="ownerCard"><div class="ownerLabel">👑 APP OWNER</div><div class="ownerName">SHAKIB KHAN</div><small>LYRICS Touch To Copy-এর Creator</small></div>
+</section>
+
+<section id="backupView" class="view">
+  <button class="back" onclick="showView('homeView')">← Home</button>
+  <div class="hero"><h1>💾 Backup & Restore</h1><p>আপনার নিজের Lyrics File নিরাপদে সংরক্ষণ ও ফিরিয়ে আনুন</p></div>
+  <div class="backupCard">
+    <h3>📦 Backup তৈরি করুন</h3>
+    <p>আপনার Custom Lyrics Files-এর একটি backup ফাইল তৈরি হবে।</p>
+    <button class="saveBtn" onclick="downloadBackup()">⬇️ Backup Download</button>
+  </div>
+  <div class="backupCard">
+    <h3>♻️ Restore করুন</h3>
+    <p>আগে তৈরি করা backup ফাইল নির্বাচন করুন।</p>
+    <input id="backupInput" class="ownerOnly" type="file" accept="application/json,.json" onchange="restoreBackup(event)">
+  </div>
+  <div class="backupNote">⚠️ Restore করলে একই নামের Custom Lyrics File-এর তথ্য নতুন backup দিয়ে প্রতিস্থাপিত হবে। Default Lyrics 1–3 নিরাপদ থাকবে।</div>
+</section>
+</main>
+<nav class="bottom">
+ <button class="navActive" onclick="showView('homeView')">⌂<small>Home</small></button>
+ <button onclick="openSearch()">⌕<small>Search</small></button>
+ <button onclick="openFavorites()">♡<small>Favorites</small></button>
+ <button onclick="openProfile()">👤<small>Profile</small></button>
+ <button onclick="openBackup()">💾<small>Backup</small></button>
+</nav>
+<div id="toast"></div>
+</div>
+
+<script>
+const defaultFiles = {"1": ["╭─💌🙌🌷─╮", "───চাইলেও তোমাকে..!!¹🩵🌻🎀───", "╰─🩵🎈──╯", "╭─🦋✨🖤─╮", "───পারবো না সরাতে’হ..!!²💙🌸✨───", "╰─🩵🎈──╯", "╭─🥀⛓️🖤─╮", "───তুমি হীন আমি অপূর্ণ..!!³🩵💫🎗️───", "╰─🩵🎈──╯", "╭─🌸✨🕊─╮", "───ভালোবাসা হয়ে যদি..!!⁴🩵🧸💫───", "╰─🩵🎈──╯", "╭─💌🙌🌷─╮", "───জীবনে না জড়াতে..!!⁵🩵🌻🎀───", "╰─🩵🎈──╯", "╭─🦋✨🖤─╮", "───এ হৃদয় হতো..!!⁶💙🌸✨───", "╰─🩵🎈──╯", "╭─🥀⛓️🖤─╮", "───প্রেম শূন্য..!!⁷🩵💫🎗️───", "╰─🩵🎈──╯", "╭─🌸✨🕊─╮", "───চাইলেও তোমাকে..!!⁸🩵🧸💫───", "╰─🩵🎈──╯", "╭─💌🙌🌷─╮", "───পারবো না সরাতে’হ..!!⁹🩵🌻🎀───", "╰─🩵🎈──╯", "╭─🦋✨🖤─╮", "───তুমি হীন আমি অপূর্ণ..!!¹⁰💙🌸✨───", "╰─🩵🎈──╯", "╭─🥀⛓️🖤─╮", "───ভালোবাসা হয়ে যদি..!!¹¹🩵💫🎗️───", "╰─🩵🎈──╯", "╭─🌸✨🕊─╮", "───জীবনে না জড়াতে..!!¹²🩵🧸💫───", "╰─🩵🎈──╯", "╭─💌🙌🌷─╮", "───এ হৃদয় হতো..!!¹³🩵🌻🎀───", "╰─🩵🎈──╯", "╭─🦋✨🖤─╮", "───প্রেম শূন্য..!!¹⁴💙🌸✨───", "╰─🩵🎈──╯", "╭─🥀⛓️🖤─╮", "───অন্তর আমার..!!¹⁵🩵💫🎗️───", "╰─🩵🎈──╯", "╭─🌸✨🕊─╮", "───তাই বারে বারবার..!!¹⁶🩵🧸💫───", "╰─🩵🎈──╯", "╭─💌🙌🌷─╮", "───বলছে সারাক্ষণ..!!¹⁷🩵🌻🎀───", "╰─🩵🎈──╯", "╭─🦋✨🖤─╮", "───তুমিই আমার জীবন..!!¹⁸💙🌸✨───", "╰─🩵🎈──╯", "╭─🥀⛓️🖤─╮", "───আমিই তোমার জীবন..!!¹⁹🩵💫🎗️───", "╰─🩵🎈──╯", "╭─🌸✨🕊─╮", "───তুমিই আমার জীবন..!!²⁰🩵🧸💫───", "╰─🩵🎈──╯", "╭─💌🙌🌷─╮", "───আমিই তোমার জীবন..!!²¹🩵🌻🎀───", "╰─🩵🎈──╯"], "2": ["᭄𝄟≛⃝1অই দেখনা ও রসিয়া𝄟✮⃝❤", "᭄𝄟≛⃝2যায়-রে মন পুড়িয়া𝄟✮⃝❤", "᭄𝄟≛⃝3প্রেমের আগুন 𝄟✮⃝❤", "᭄𝄟≛⃝4জ্বলে বুকে দ্বিগুন𝄟✮⃝❤,", "᭄𝄟≛⃝5 হায়, রইব কি করিয়া𝄟✮⃝❤", "᭄𝄟≛⃝6 আজকে দিল দরিয়া,𝄟✮⃝❤", "᭄𝄟≛⃝7খুঁজে ফিরে𝄟✮⃝❤", "᭄𝄟≛⃝8 রংঙ্গলীলায় ফাগুন𝄟✮⃝❤", "᭄𝄟≛⃝9 আরে দেখনা ও রসিয়𝄟✮⃝❤", "᭄𝄟≛⃝10যায়-রে মন পুড়িয়া𝄟✮⃝❤", "᭄𝄟≛⃝11প্রেমের আগুন 𝄟✮⃝❤", "᭄𝄟≛⃝12জ্বলে বুকে দ্বিগুন𝄟✮⃝❤,", "᭄𝄟≛⃝13 রইব কি করিয়া𝄟✮⃝❤", "᭄𝄟≛⃝14আজকে দিল দরিয়া,𝄟✮⃝❤", "᭄𝄟≛⃝15খুঁজে ফিরে𝄟✮⃝❤", "᭄𝄟≛⃝16 রংঙ্গলীলায় ফাগুন𝄟✮⃝❤", "᭄𝄟≛⃝17বাসতে ভাল লাগে-রে মন𝄟✮⃝❤", "᭄𝄟≛⃝18 শোন-রে বলি ওরে সুজন𝄟✮⃝❤", "᭄𝄟≛⃝19নিভিয়ে যা এই-𝄟✮⃝❤", "᭄𝄟≛⃝20না মনের আগুন𝄟✮⃝❤", "᭄𝄟≛⃝21দেখনা ও রসিয়া𝄟✮⃝❤", "᭄𝄟≛⃝22যায়-রে মন পুড়িয়া𝄟✮⃝❤", "᭄𝄟≛⃝23প্রেমের আগুন জ্বলে বুকে দ্বিগুন𝄟✮⃝❤"], "3": ["⎯͢⎯⃝১🥂ভাতার আমার কাতার গেছে⎯꯭̽𝆺꯭𝅥🕊️", "⎯͢⎯⃝২🥂চাকরি করিতে⎯꯭̽𝆺꯭𝅥🕊️", "⎯͢⎯⃝৩🥂এক গা বিছানায় ঘুম আসে না⎯꯭̽𝆺꯭𝅥🕊️", "⎯͢⎯⃝৪🥂ছটফটাই রাতে ⎯꯭̽𝆺꯭𝅥🕊️", "⎯͢⎯⃝৫🥂ভাতার আমার কাতার গেছে⎯꯭̽𝆺꯭𝅥🕊️", "⎯͢⎯⃝৬🥂চাকরি করিতে⎯꯭̽𝆺꯭𝅥🕊️", "⎯͢⎯⃝৭🥂এক গা বিছানায় ঘুম আসে না⎯꯭̽𝆺꯭𝅥🕊️", "⎯͢⎯⃝৮🥂ছটফটাই রাতে ⎯꯭̽𝆺꯭𝅥🕊️", "⎯͢⎯⃝৯🥂কোলবালিশে মরা মরি⎯꯭̽𝆺꯭𝅥🕊️", "⎯͢⎯⃝১০🥂আর কত করুন⎯꯭̽𝆺꯭𝅥🕊️", "⎯͢⎯⃝১১🥂কোলবালিশে মরা মরি⎯꯭̽𝆺꯭𝅥🕊️", "⎯͢⎯⃝১২🥂আর কত করুন⎯꯭̽𝆺꯭𝅥🕊️", "⎯͢⎯⃝১৩🥂আল্লাহ তুমি দাওনা আমার⎯꯭̽𝆺꯭𝅥🕊️", "⎯͢⎯⃝১৪🥂চোখে একটু ঘুম⎯꯭̽𝆺꯭𝅥🕊️", "⎯͢⎯⃝১৫🥂ও আল্লাহ তুমি দাওনা আমার⎯꯭̽𝆺꯭𝅥🕊️", "⎯͢⎯⃝১৬🥂চোখে একটু ঘুম⎯꯭̽𝆺꯭𝅥🕊️", "⎯͢⎯⃝১৭🥂সানকা যেতে মন বসে না⎯꯭̽𝆺꯭𝅥🕊️", "⎯͢⎯⃝১৮🥂ভাবি বসে তাহার কথা ⎯꯭̽𝆺꯭𝅥🕊️", "⎯͢⎯⃝১৯🥂শীতের রাতে মন বুঝিনা⎯꯭̽𝆺꯭𝅥🕊️", "⎯͢⎯⃝২০🥂দেয়া গায়ে কাথা⎯꯭̽𝆺꯭𝅥🕊️", "⎯͢⎯⃝২১🥂কাম কাজে মন বসে না⎯꯭̽𝆺꯭𝅥🕊️", "⎯͢⎯⃝২২🥂ভাবি বসে তাহার কথা ⎯꯭̽𝆺꯭𝅥🕊️", "⎯͢⎯⃝২৩🥂শীতের রাতে মিটেনা⎯꯭̽𝆺꯭𝅥🕊️", "⎯͢⎯⃝২৪🥂দেয়া গায়ে কাথা⎯꯭̽𝆺꯭𝅥🕊️", "⎯͢⎯⃝২৫🥂কয়রা গেছে বন্ধু আমার⎯꯭̽𝆺꯭𝅥🕊️", "⎯͢⎯⃝২৬🥂কঠিনও কহু⎯꯭̽𝆺꯭𝅥🕊️", "⎯͢⎯⃝২৭🥂কয়রা গেছে বন্ধু আমার⎯꯭̽𝆺꯭𝅥🕊️", "⎯͢⎯⃝২৮🥂কঠিনও কহু..⎯꯭̽𝆺꯭𝅥🕊️", "⎯͢⎯⃝২৯🥂আল্লাহ তুমি দাওনা আমার⎯꯭̽𝆺꯭𝅥🕊️", "⎯͢⎯⃝৩০🥂চোখে একটু ঘুম⎯꯭̽𝆺꯭𝅥🕊️", "⎯͢⎯⃝৩১🥂ও আল্লাহ তুমি দাওনা আমার⎯꯭̽𝆺꯭𝅥🕊️", "⎯͢⎯⃝৩২🥂চোখে একটু ঘুম⎯꯭̽𝆺꯭𝅥🕊️", "⎯͢⎯⃝৩৩🥂আল্লাহ তুমি দাওনা আমার⎯꯭̽𝆺꯭𝅥🕊️", "⎯͢⎯⃝৩৪🥂চোখে একটু ঘুম⎯꯭̽𝆺꯭𝅥🕊️", "⎯͢⎯⃝৩৫🥂ও আল্লাহ তুমি দাওনা আমার⎯꯭̽𝆺꯭𝅥🕊️", "⎯͢⎯⃝৩৬🥂চোখে একটু ঘুম⎯꯭̽𝆺꯭𝅥🕊️"]};
+let customFiles = JSON.parse(localStorage.getItem("lyricsCustomFiles") || "{}");
+let fileStyles = JSON.parse(localStorage.getItem("lyricsFileStyles") || "{}");
+let fileNames = JSON.parse(localStorage.getItem("lyricsFileNames") || "{}");
+let selectedStyle = 1;
+const STYLE_NAMES={1:"Soft Glow",2:"Warm Bubble",3:"Aqua Dash",4:"Pink Wave",5:"Clean Card",6:"Golden Edge",7:"Classic Line",8:"Round Cloud",9:"Blue Edge",10:"Silver Flow"};
+let files = Object.assign({}, defaultFiles, customFiles);
+
+function esc(s) {
+ return s.replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+function openSearch() {
+  showView("searchView");
+  const input = document.getElementById("searchInput");
+  input.focus();
+  runSearch();
+}
+function runSearch() {
+  const q = document.getElementById("searchInput").value.trim().toLowerCase();
+  const box = document.getElementById("searchResults");
+  if (!q) {
+    box.innerHTML = '<div class="emptySearch">🔎<br><b>কিছু লিখে Search করুন</b><small>File name বা যেকোনো Lyrics line খুঁজতে পারবেন</small></div>';
+    return;
+  }
+  const results = [];
+  Object.keys(files).sort((a,b)=>Number(a)-Number(b)).forEach(id => {
+    const fileName = (fileNames[id] || ("Lyrics " + id)).toLowerCase();
+    files[id].forEach((line, index) => {
+      if (fileName.includes(q) || line.toLowerCase().includes(q)) {
+        results.push({id, line, index});
+      }
+    });
+  });
+  if (!results.length) {
+    box.innerHTML = '<div class="emptySearch">😔<br><b>No Lyrics Found</b><small>অন্য কোনো শব্দ দিয়ে চেষ্টা করুন</small></div>';
+    return;
+  }
+  box.innerHTML = '<div class="resultCount">' + results.length + 'টি result পাওয়া গেছে</div>' +
+    results.map(r => '<button class="searchResult" onclick="openSearchResult(\'' + r.id + '\',' + r.index + ')">' +
+      '<div class="resultTop"><b>📄 ' + esc(fileNames[r.id] || ('Lyrics ' + r.id)) + '</b><span>›</span></div>' +
+      '<div class="resultLine">' + highlight(r.line, q) + '</div></button>'
+    ).join("");
+}
+function highlight(text, q) {
+  const safe = esc(text);
+  const safeQ = q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return safe.replace(new RegExp("(" + safeQ + ")", "ig"), "<mark>$1</mark>");
+}
+function openSearchResult(id, index) {
+  openFile(id);
+  setTimeout(() => {
+    const lines = document.querySelectorAll("#readerLines .lyricLine");
+    if (lines[index]) {
+      lines[index].scrollIntoView({behavior:"smooth", block:"center"});
+      lines[index].classList.add("copied");
+      setTimeout(() => lines[index].classList.remove("copied"), 900);
+    }
+  }, 120);
+}
+function clearSearch() {
+  document.getElementById("searchInput").value = "";
+  runSearch();
+  document.getElementById("searchInput").focus();
+}
+
+function showView(id) {
+ document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
+ document.getElementById(id).classList.add("active");
+ window.scrollTo(0,0);
+}
+function renderFiles() {
+ const box=document.getElementById("fileList");
+ const ids=Object.keys(files).sort((a,b)=>Number(a)-Number(b));
+ box.innerHTML=ids.map(id=>`<button class="fileCard" onclick="openFile('${id}')">
+   <span class="fileIcon">📄</span>
+   <span><b>${esc(fileNames[id] || ("Lyrics "+id))}</b><small>${files[id].length}টি Lyrics</small></span>
+   <span class="fileActions">
+     ${isOwnerUnlocked()?`<span class="editBtn" onclick="event.stopPropagation(); editFile(\'${id}\')">✎</span><span class="deleteBtn" onclick="event.stopPropagation(); deleteFile(\'${id}\')">🗑</span>`:""}
+     <span class="arrow">›</span>
+   </span>
+ </button>`).join("");
+}
+function openFile(id) {
+ document.getElementById("readerTitle").innerHTML=`<h1>${esc(fileNames[id] || ("Lyrics "+id))}</h1><p>${files[id].length}টি Lyrics</p>`;
+ document.getElementById("readerLines").innerHTML=files[id].map((line,i)=>{const key=makeLyricKey(id,i); const st=fileStyles[id] || ((Number(id)+i)%10)+1; return `<div class="lyricWrap style${st}"><button class="lyricLine" onclick="copyLine(this)">${esc(line)}</button><div class="socialBar"><button class="socialBtn" id="like-${key}" onclick="toggleLike(\'${key}\',this)">♡ React <span>0</span></button><button class="socialBtn" id="fav-${key}" onclick="toggleFavorite(\'${key}\',this)">☆ Save</button><button class="socialBtn" onclick="toggleComments(\'${key}\')">💬 Comment <span id="cc-${key}">0</span></button><button class="socialBtn" onclick="shareLine(event, ${JSON.stringify(line)})">↗️ Share</button></div><div class="commentBox" id="comments-${key}"><textarea id="input-${key}" placeholder="এই Lyrics নিয়ে কিছু লিখুন..."></textarea><button class="saveBtn" style="margin-top:7px;padding:10px" onclick="addComment(\'${key}\')">💬 Comment</button><div class="commentList" id="list-${key}"></div></div></div>`}).join(""); renderSocialState();
+ showView("readerView");
+}
+async function copyLine(btn) {
+ const text = btn.textContent;
+ try { await navigator.clipboard.writeText(text); } catch(e) {
+   const t=document.createElement("textarea"); t.value=text; document.body.appendChild(t); t.select(); document.execCommand("copy"); t.remove();
+ }
+ btn.classList.add("copied");
+ toast("✓ Copied!");
+ const oldLabel = btn.dataset.copyLabel;
+ btn.dataset.copyLabel = btn.textContent;
+ btn.setAttribute("aria-label", "Copied");
+ setTimeout(()=>{ btn.classList.remove("copied"); btn.dataset.copyLabel = oldLabel || ""; }, 900);
+}
+async function shareLine(e, text) {
+ e.stopPropagation();
+ try {
+   if (navigator.share) { await navigator.share({text}); toast("📤 Share ready"); }
+   else { await navigator.clipboard.writeText(text); toast("📋 Copy হয়েছে — এখন যেখানে চান Share করুন"); }
+ } catch(err) { if (err && err.name !== "AbortError") toast("⚠️ Share করা যায়নি"); }
+}
+const SOCIAL_KEY="lyricsSocialState";
+function getSocial(){ try{return JSON.parse(localStorage.getItem(SOCIAL_KEY)||"{}")}catch(e){return {}} }
+function saveSocial(x){localStorage.setItem(SOCIAL_KEY,JSON.stringify(x))}
+function makeLyricKey(id,i){return String(id)+"-"+String(i)}
+function renderSocialState(){
+ const st=getSocial();
+ Object.keys(files).forEach(id=>files[id].forEach((_,i)=>{
+   const k=makeLyricKey(id,i), d=st[k]||{likes:0,liked:false,comments:[]};
+   const b=document.getElementById("like-"+k); if(b){b.classList.toggle("liked",!!d.liked);b.innerHTML=(d.liked?"♥":"♡")+" React <span>"+(d.likes||0)+"</span>"}
+   const f=document.getElementById("fav-"+k); if(f){const on=getFavorites().includes(k);f.classList.toggle("liked",on);f.textContent=on?"★ Saved":"☆ Save"}
+   const c=document.getElementById("cc-"+k); if(c)c.textContent=(d.comments||[]).length;
+   const l=document.getElementById("list-"+k); if(l)l.innerHTML=(d.comments||[]).map(x=>`<div class="commentItem">${esc(x)}</div>`).join("");
+ }));
+}
+function toggleLike(k,btn){const st=getSocial(),d=st[k]||{likes:0,liked:false,comments:[]};d.liked=!d.liked;d.likes=Math.max(0,(d.likes||0)+(d.liked?1:-1));st[k]=d;saveSocial(st);renderSocialState();toast(d.liked?"❤️ React added":"♡ React removed")}
+function toggleComments(k){const el=document.getElementById("comments-"+k);if(el){el.style.display=el.style.display==="block"?"none":"block";renderSocialState()}}
+function addComment(k){const input=document.getElementById("input-"+k);const v=input.value.trim();if(!v){toast("⚠️ Comment লিখুন");return}const st=getSocial(),d=st[k]||{likes:0,liked:false,comments:[]};d.comments=d.comments||[];d.comments.push(v);st[k]=d;saveSocial(st);input.value="";renderSocialState();document.getElementById("comments-"+k).style.display="block";toast("✓ Comment added")}
+const FAV_KEY="lyricsFavorites";
+const PROFILE_KEY="lyricsProfile";
+function getFavorites(){try{return JSON.parse(localStorage.getItem(FAV_KEY)||"[]")}catch(e){return []}}
+function saveFavorites(x){localStorage.setItem(FAV_KEY,JSON.stringify(x))}
+function toggleFavorite(k,btn){let a=getFavorites(); if(a.includes(k)){a=a.filter(x=>x!==k);toast("☆ Favorite removed")}else{a.push(k);toast("★ Favorite saved")} saveFavorites(a);renderSocialState(); if(document.getElementById("favoritesView").classList.contains("active"))renderFavorites()}
+function renderFavorites(){const box=document.getElementById("favoriteList");const a=getFavorites(); if(!a.length){box.innerHTML='<div class="favoriteEmpty">♡<b>এখনও কোনো Favorite নেই</b><small>Lyrics-এর নিচে ☆ Save চাপুন</small></div>';return} box.innerHTML=a.map(k=>{const [id,idx]=k.split("-");const line=files[id]?.[Number(idx)];if(line==null)return "";return `<div class="favoriteCard"><div class="favoriteTop"><button class="favoriteLine" onclick="openFile(\'${id}\')">${esc(line)}</button><button class="socialBtn liked" onclick="toggleFavorite(\'${k}\',this)">★</button></div><div style="color:#777;font-size:12px;margin-top:7px">${esc(fileNames[id] || ("Lyrics "+id))} · Line ${Number(idx)+1}</div></div>`}).join("")||'<div class="favoriteEmpty">♡<b>Favorite পাওয়া যায়নি</b></div>'}
+function openFavorites(){renderFavorites();showView("favoritesView")}
+function getProfile(){try{return JSON.parse(localStorage.getItem(PROFILE_KEY)||"{}")}catch(e){return {}}}
+function renderProfile(){const p=getProfile();const name=p.name||"Your Name";document.getElementById("profileNameInput").value=p.name||"";document.getElementById("profileDisplayName").textContent=name;const box=document.getElementById("avatarPreview");box.innerHTML=p.photo?`<img src="${p.photo}" alt="Profile photo">`:"👤"}
+function previewProfilePhoto(e){const f=e.target.files?.[0];if(!f)return; if(f.size>2*1024*1024){toast("⚠️ Photo 2MB-এর মধ্যে রাখুন");e.target.value="";return} const r=new FileReader();r.onload=()=>{const box=document.getElementById("avatarPreview");box.innerHTML=`<img src="${r.result}" alt="Profile photo">`;box.dataset.pending=r.result};r.readAsDataURL(f)}
+function saveProfile(){const p=getProfile();const name=document.getElementById("profileNameInput").value.trim();if(name)p.name=name;else delete p.name;const pending=document.getElementById("avatarPreview").dataset.pending;if(pending)p.photo=pending;localStorage.setItem(PROFILE_KEY,JSON.stringify(p));delete document.getElementById("avatarPreview").dataset.pending;renderProfile();toast("✓ Profile saved")}
+function removeProfilePhoto(){const p=getProfile();delete p.photo;localStorage.setItem(PROFILE_KEY,JSON.stringify(p));document.getElementById("profilePhotoInput").value="";renderProfile();toast("✓ Photo removed")}
+function openProfile(){renderProfile();showView("profileView")}
+
+function selectLyricsStyle(n){selectedStyle=n;document.querySelectorAll(".styleChoice").forEach(b=>b.classList.toggle("active",Number(b.dataset.style)===n));}
+function refreshStylePicker(){selectLyricsStyle(Number(selectedStyle)||1);}
+
+const TG_OWNER_ID = "7236842673"; // এখানে Owner-এর Telegram numeric ID বসবে
+let tgUser = null;
+function initTelegram(){
+  try{
+    const tg=window.Telegram?.WebApp;
+    if(tg){
+      tg.ready(); tg.expand();
+      try{tg.setHeaderColor('#ffffff'); tg.setBackgroundColor('#f7f5fb');}catch(e){}
+      tgUser=tg.initDataUnsafe?.user || null;
+    }
+  }catch(e){}
+  const el=document.getElementById('tgUser');
+  if(tgUser){ el.textContent='@'+(tgUser.username || tgUser.first_name || 'Telegram'); }
+  else { el.textContent='Preview'; }
+  applyOwnerMode();
+}
+function isTelegram(){return !!window.Telegram?.WebApp?.initData}
+function isOwnerUnlocked(){ return !!(tgUser && TG_OWNER_ID && String(tgUser.id)===String(TG_OWNER_ID)); }
+function requireOwner(){ if(isOwnerUnlocked()) return true; showView('ownerView'); const st=document.getElementById('ownerStatus'); if(st){ if(!tgUser) st.innerHTML='📱 এই ফাইলটি Telegram Mini App হিসেবে খুলুন।<br><br>Telegram account পাওয়া গেলে Owner access যাচাই হবে।'; else if(!TG_OWNER_ID) st.innerHTML='⚙️ Owner Telegram ID এখনো এই build-এ সেট করা হয়নি।'; else st.innerHTML='⛔ এই Telegram account-এর Owner permission নেই।'; } return false; }
+function unlockOwner(){ requireOwner(); }
+function applyOwnerMode(){ document.getElementById('addFileBtn')?.classList.toggle('ownerOnly',!isOwnerUnlocked()); document.getElementById('backupInput')?.classList.toggle('ownerOnly',!isOwnerUnlocked()); document.querySelectorAll('[data-owner-action]').forEach(x=>x.classList.toggle('ownerOnly',!isOwnerUnlocked())); renderFiles(); }
+function openAdd() {
+ if(!requireOwner()) return;
+ delete document.getElementById("addView").dataset.editing;
+ selectedStyle=1; refreshStylePicker();
+ document.getElementById("fileName").value="";
+ document.getElementById("lyricsText").value="";
+ updateCount();
+ showView("addView");
+ document.getElementById("fileName").focus();
+}
+function updateCount() {
+ const lines=document.getElementById("lyricsText").value.split(/\r?\n/).filter(x=>x.length>0);
+ document.getElementById("lineCount").textContent=lines.length+"টি Lyrics";
+}
+document.getElementById("lyricsText").addEventListener("input",updateCount);
+function saveFile() {
+ if(!requireOwner()) return;
+ let name=document.getElementById("fileName").value.trim();
+ const lines=document.getElementById("lyricsText").value.split(/\r?\n/).filter(x=>x.length>0);
+ if(!name) { toast("⚠️ File Name দিন"); return; }
+ if(!lines.length) { toast("⚠️ Lyrics লিখুন"); return; }
+ const editingId = document.getElementById("addView").dataset.editing || "";
+ const nextId=()=>String(Math.max(0,...Object.keys(files).map(Number))+1);
+ let id=editingId;
+ if(!id){
+   const used=Object.keys(files);
+   let candidate=nextId();
+   if(/^Lyrics\s*\d+$/i.test(name)){
+     const m=name.match(/^(?:Lyrics\s*)(\d+)$/i);
+     const requested=m?m[1]:candidate;
+     id=used.includes(requested)?candidate:requested;
+     name="Lyrics "+id;
+   } else {
+     id=candidate;
+   }
+ }
+ customFiles[id]=lines;
+ fileStyles[id]=selectedStyle;
+ fileNames[id]=name;
+ localStorage.setItem("lyricsFileStyles",JSON.stringify(fileStyles));
+ localStorage.setItem("lyricsFileNames",JSON.stringify(fileNames));
+ delete document.getElementById("addView").dataset.editing;
+ localStorage.setItem("lyricsCustomFiles",JSON.stringify(customFiles));
+ files=Object.assign({},defaultFiles,customFiles);
+ renderFiles();
+ toast("✓ Lyrics File saved");
+ setTimeout(()=>showView("homeView"),500);
+}
+function editFile(id) {
+ if(!requireOwner()) return;
+ if (String(id)==="1" || String(id)==="2" || String(id)==="3") {
+   toast("ℹ️ Default Lyrics File সরাসরি Edit করা যাবে না");
+   return;
+ }
+ const lines = files[id] || [];
+ document.getElementById("fileName").value = fileNames[id] || ("Lyrics " + id);
+ document.getElementById("lyricsText").value = lines.join("\n");
+ selectedStyle=fileStyles[id]||1; refreshStylePicker();
+ document.getElementById("addView").dataset.editing = id;
+ updateCount();
+ showView("addView");
+ document.getElementById("fileName").focus();
+}
+
+function deleteFile(id) {
+ if(!requireOwner()) return;
+ if (String(id) === "1" || String(id) === "2" || String(id) === "3") {
+   toast("ℹ️ Default Lyrics File delete করা যাবে না");
+   return;
+ }
+ if (!confirm((fileNames[id] || ("Lyrics " + id)) + " File টি Delete করতে চান?")) return;
+ delete customFiles[id];
+ delete fileStyles[id];
+ delete fileNames[id];
+ let fav=getFavorites().filter(k=>!k.startsWith(String(id)+"-"));
+ saveFavorites(fav);
+ const social=getSocial(); Object.keys(social).forEach(k=>{if(k.startsWith(String(id)+"-")) delete social[k]}); saveSocial(social);
+ localStorage.setItem("lyricsCustomFiles", JSON.stringify(customFiles));
+ localStorage.setItem("lyricsFileStyles", JSON.stringify(fileStyles));
+ localStorage.setItem("lyricsFileNames", JSON.stringify(fileNames));
+ files = Object.assign({}, defaultFiles, customFiles);
+ renderFiles();
+ toast("✓ Lyrics File deleted");
+}
+
+function toast(m) {
+ const t=document.getElementById("toast"); t.textContent=m; t.classList.add("show");
+ setTimeout(()=>t.classList.remove("show"),1500);
+}
+renderFiles();
+initTelegram();
+
+function openBackup(){ showView("backupView"); }
+function downloadBackup(){
+  const payload={version:3,app:"LYRICS Touch To Copy",owner:"SHAKIB KHAN",createdAt:new Date().toISOString(),customFiles:JSON.parse(localStorage.getItem("lyricsCustomFiles")||"{}"),fileStyles:JSON.parse(localStorage.getItem("lyricsFileStyles")||"{}"),fileNames:JSON.parse(localStorage.getItem("lyricsFileNames")||"{}"),favorites:getFavorites(),profile:getProfile(),social:getSocial()} ;
+  const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"});
+  const url=URL.createObjectURL(blob); const a=document.createElement("a");
+  a.href=url; a.download="lyrics-touch-to-copy-backup.json"; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+  toast("✓ Backup তৈরি হয়েছে");
+}
+function restoreBackup(event){
+  if(!requireOwner()) { event.target.value=""; return; }
+  const file=event.target.files?.[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onload=()=>{
+    try{
+      const data=JSON.parse(reader.result); const incoming=data.customFiles;
+      if(!incoming || typeof incoming!=="object" || Array.isArray(incoming)) throw new Error("invalid");
+      const safeFiles={}; Object.keys(incoming).forEach(id=>{if(!["1","2","3"].includes(String(id)) && Array.isArray(incoming[id])) safeFiles[String(id)]=incoming[id].map(x=>String(x));});
+      const safeStyles=(data.fileStyles && typeof data.fileStyles==="object" && !Array.isArray(data.fileStyles))?data.fileStyles:{};
+      const safeNames=(data.fileNames && typeof data.fileNames==="object" && !Array.isArray(data.fileNames))?data.fileNames:{};
+      Object.keys(safeStyles).forEach(id=>{if(!safeFiles[id]) delete safeStyles[id]});
+      Object.keys(safeNames).forEach(id=>{if(!safeFiles[id]) delete safeNames[id]});
+      fileStyles=safeStyles; fileNames=safeNames;
+      localStorage.setItem("lyricsCustomFiles",JSON.stringify(safeFiles));
+      localStorage.setItem("lyricsFileStyles",JSON.stringify(fileStyles));
+      localStorage.setItem("lyricsFileNames",JSON.stringify(fileNames));
+      if(Array.isArray(data.favorites))saveFavorites(data.favorites.filter(k=>{const p=String(k).split("-");return safeFiles[p[0]]?.[Number(p[1])]!==undefined || ["1","2","3"].includes(p[0])}));
+      else saveFavorites([]);
+      if(data.social && typeof data.social==="object" && !Array.isArray(data.social))saveSocial(data.social); else saveSocial({});
+      if(data.profile && typeof data.profile==="object" && !Array.isArray(data.profile))localStorage.setItem(PROFILE_KEY,JSON.stringify(data.profile));
+      else localStorage.removeItem(PROFILE_KEY);
+      customFiles=safeFiles; files=Object.assign({},defaultFiles,customFiles); renderFiles(); renderFavorites(); renderProfile();
+      toast("✓ Backup Restore হয়েছে");
+    }catch(e){ toast("⚠️ Backup ফাইলটি সঠিক নয়"); }
+    event.target.value="";
+  };
+  reader.readAsText(file);
+}
+</script>
+</body></html>
